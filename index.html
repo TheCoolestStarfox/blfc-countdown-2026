@@ -62,6 +62,46 @@
   box-shadow: 0 0 15px #0008;
   z-index: 1000;
 }
+    #nerdBadge {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #ffcc00;
+  color: #000;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 0 8px #0005;
+  transition: background 0.3s;
+  z-index: 999;
+}
+#nerdBadge:hover {
+  background: #ffe877;
+}
+
+#infoDialog {
+  position: fixed;
+  bottom: 60px;
+  left: 20px;
+  width: 260px;
+  background: #1e1e2f;
+  color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  display: none;
+  font-size: 14px;
+  box-shadow: 0 0 15px #0008;
+  animation: fadeIn 0.4s ease-out;
+  z-index: 1000;
+  cursor: move;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
   </style>
 </head>
 <body>
@@ -113,6 +153,73 @@
     const dialog = document.getElementById("infoDialog");
     dialog.style.display = (dialog.style.display === "block") ? "none" : "block";
   }
+</script>
+  <!-- Nerd & Proud Badge -->
+<div id="nerdBadge" onclick="toggleDialog()">
+  🤓 Nerd & Proud
+</div>
+
+<div id="infoDialog">
+  <div id="dialogContent">
+    <strong id="dialogTitle">Initializing...</strong><br/><br/>
+    <span id="dialogMessage">Loading transmission...</span>
+  </div>
+</div>
+  <script>
+  const infoDialog = document.getElementById("infoDialog");
+  const title = document.getElementById("dialogTitle");
+  const message = document.getElementById("dialogMessage");
+
+  function toggleDialog() {
+    const isOpen = infoDialog.style.display === "block";
+    infoDialog.style.display = isOpen ? "none" : "block";
+    if (!isOpen) updateDialogMessage();
+  }
+
+  function updateDialogMessage() {
+    // Get Pacific Time
+    const pst = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" }));
+    const hour = pst.getHours();
+
+    let greeting = "";
+    if (hour < 5) greeting = "Night Owl Mode: Cosmic quiet time 🌌";
+    else if (hour < 12) greeting = "Good morning, early explorer ☀️";
+    else if (hour < 18) greeting = "Afternoon upgrades in progress 🛠️";
+    else greeting = "Good evening, starlit scholar 🌠";
+
+    title.textContent = "Starfox’s Nerd Pride Terminal";
+    message.textContent = greeting + "\nNerd means curiosity, courage, and caring deeply. You’re exactly where you belong.";
+  }
+
+  // Drag to move dialog
+  infoDialog.onmousedown = function(event) {
+    event.preventDefault();
+    let shiftX = event.clientX - infoDialog.getBoundingClientRect().left;
+    let shiftY = event.clientY - infoDialog.getBoundingClientRect().top;
+
+    function moveAt(pageX, pageY) {
+      infoDialog.style.left = pageX - shiftX + 'px';
+      infoDialog.style.top = pageY - shiftY + 'px';
+      infoDialog.style.bottom = 'auto'; // Detach from bottom if dragged
+    }
+
+    function onMouseMove(e) {
+      moveAt(e.pageX, e.pageY);
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.onmouseup = function() {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.onmouseup = null;
+    };
+  };
+
+  // Close dialog when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!infoDialog.contains(e.target) && e.target.id !== "nerdBadge") {
+      infoDialog.style.display = "none";
+    }
+  });
 </script>
 </body>
 </html>
